@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { runCrucible } from "../src/crucible/crucible.ts";
 import { HOLMIUM } from "../src/materials/holmium.ts";
-import { ORION_ENGINE_STATUS } from "../src/orion/contract.ts";
 import type { ValidationStatus } from "../src/contracts/evidence.ts";
 import { StatusBadge } from "../src/ui/status-badge.tsx";
 
@@ -17,7 +16,7 @@ export default function Dashboard() {
     { href: "/materials", n: "01", t: "Element 67 Registry", s: `${sourced} sourced · ${placeholders} placeholders`, d: "Holmium material record with explicit data status." },
     { href: "/workbench", n: "02", t: "Euler Workbench", s: "Working", d: "Angular acceleration from I, ω, τ with full intermediate values." },
     { href: "/simulation", n: "03", t: "Dynamics Lab", s: "Working (torque-free)", d: "RK4 rigid-body simulation with conservation-error tracking." },
-    { href: "/orion", n: "04", t: "ORION Console", s: `Templates only · engine ${ORION_ENGINE_STATUS}`, d: "Transparent keyword-matched explanations; no AI model." },
+    { href: "/orion", n: "04", t: "ORION Console", s: "Templates + external model (dev branch)", d: "Transparent console; model output is unverified and contract-guarded." },
     { href: "/crucible", n: "05", t: "Scientific Crucible", s: `${report.checks.length} checks`, d: "Independent validation with explicit statuses." },
     { href: "/ledger", n: "06", t: "Evidence Ledger", s: "In-browser · non-persistent", d: "Hash-linked records of calculations and validations." },
   ];
@@ -76,7 +75,7 @@ export default function Dashboard() {
       <ul className="small">
         <li>Magnetic torque in the Dynamics Lab (engine supports a fixed dipole in uniform B; UI is torque-free only).</li>
         <li>Holmium material model, field gradients / forces, suspension and stability analysis.</li>
-        <li>Cryogenic thermal model. Durable or signed ledger. ORION inference engine.</li>
+        <li>Cryogenic thermal model. Durable or signed ledger. Scientific evaluation of ORION model output.</li>
         <li>Hardware control, experiments and autonomous agents are out of scope by governance.</li>
       </ul>
     </>

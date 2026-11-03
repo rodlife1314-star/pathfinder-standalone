@@ -379,9 +379,9 @@ const checks: CheckDef[] = [
   },
   {
     id: "orion.inference-engine",
-    title: "ORION reasoning engine output validation",
+    title: "Scientific evaluation of ORION language-model output",
     category: "falsification",
-    method: "Not built in Phase 001: ORION has no inference engine (static templates only), so there is nothing generative to validate.",
+    method: "Not built. Model output passes a contract guard (class, status, forbidden actions) and numerical statements are flagged, but nothing checks whether its science is correct.",
   },
   {
     id: "hyp.shaftless-suspension",

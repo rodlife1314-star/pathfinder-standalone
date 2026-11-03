@@ -137,3 +137,14 @@ magnetic torque in the Dynamics Lab UI. Out of scope by governance: hardware con
 
 ---
 *Prepared for review; not a completion certificate. Operator authorisation is required before Phase 002.*
+
+---
+
+## Addendum (2026-11-03): Phase 002a on a separate branch
+
+After this handover was written, the Operator authorised an isolated ORION language-model integration on branch
+`lab067/orion-llm-dev`, before this review. It is **not** part of the Phase 001 baseline. Details, evidence and
+NOT TESTED items: [PHASE-002A-ORION-MODEL.md](./PHASE-002A-ORION-MODEL.md).
+
+7. Is the model admission design (contract guard reuse, reject-not-repair, quarantined raw text, numeric flagging) adequate before any real use?
+8. Should `/api/orion` require authentication or rate limiting before Phase 002?

@@ -1,5 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import type { OrionModelResponse } from "../orion/model/service.ts";
+import type { PublicDescriptor } from "../orion/model/config.ts";
+import { ModelResponseView } from "./orion-model-panel.tsx";
 import { askOrion, responseToProposal, type OrionQueryKind, type OrionResponse } from "../orion/console.ts";
 import { recordOrionProposal } from "../orion/contract.ts";
 import type { LedgerEntry } from "../ledger/ledger.ts";
@@ -27,8 +30,33 @@ export function OrionConsole() {
   const [resp, setResp] = useState<OrionResponse | null>(null);
   const [rec, setRec] = useState<LedgerEntry[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  const [mode, setMode] = useState<"templates" | "model">("templates");
+  const [desc, setDesc] = useState<(PublicDescriptor & { reason?: string }) | null>(null);
+  const [modelResp, setModelResp] = useState<OrionModelResponse | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [callErr, setCallErr] = useState<string | null>(null);
 
-  const ask = (k = kind, q = text) => { if (!q.trim()) return; setResp(askOrion({ kind: k, text: q })); setRec(null); setErr(null); };
+  useEffect(() => {
+    fetch("/api/orion", { cache: "no-store" }).then((r) => r.json()).then(setDesc).catch(() => setDesc(null));
+  }, []);
+
+  const askModel = async (k: OrionQueryKind, q: string) => {
+    setBusy(true); setModelResp(null); setCallErr(null);
+    try {
+      const r = await fetch("/api/orion", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ kind: k, text: q }) });
+      const body = await r.json();
+      if (body?.schema) setModelResp(body as OrionModelResponse);
+      else setCallErr(`${body?.error?.kind ?? "error"}: ${body?.error?.message ?? `HTTP ${r.status}`}`);
+    } catch (e) { setCallErr(`network: ${(e as Error).message}`); }
+    finally { setBusy(false); }
+  };
+
+  const ask = (k = kind, q = text) => {
+    if (!q.trim() || busy) return;
+    setRec(null); setErr(null);
+    if (mode === "model") { setResp(null); void askModel(k, q.trim()); }
+    else { setModelResp(null); setResp(askOrion({ kind: k, text: q })); }
+  };
   const recordProposal = () => {
     if (!resp) return;
     try {
@@ -44,6 +72,17 @@ export function OrionConsole() {
   return (
     <>
       <div className="panel">
+        <fieldset style={{ marginBottom: 10 }}>
+          <legend>Reasoning source</legend>
+          <div className="row">
+            <label className="row" style={{ gap: 6 }}><input type="radio" name="mode" checked={mode === "templates"} onChange={() => setMode("templates")} /> Static templates (offline, no model)</label>
+            <label className="row" style={{ gap: 6 }}>
+              <input type="radio" name="mode" checked={mode === "model"} disabled={!desc?.configured} onChange={() => setMode("model")} />
+              Language model {desc ? <span className="mono small">{desc.model} @ {desc.provider}</span> : "(checking…)"}
+            </label>
+          </div>
+          {desc && !desc.configured && <p className="small muted" style={{ marginBottom: 0 }}>Model mode unavailable: {desc.reason ?? "not configured on the server"}.</p>}
+        </fieldset>
         <div className="fields" style={{ gridTemplateColumns: "minmax(180px, 240px) 1fr" }}>
           <label className="field">Request type
             <select value={kind} onChange={(e) => setKind(e.target.value as OrionQueryKind)}>{KINDS.map((k) => <option key={k.v} value={k.v}>{k.label}</option>)}</select>
@@ -53,12 +92,14 @@ export function OrionConsole() {
           </label>
         </div>
         <div className="row" style={{ marginTop: 10 }}>
-          <button className="btn primary" onClick={() => ask()}>Ask ORION</button>
+          <button className="btn primary" onClick={() => ask()} disabled={busy}>{busy ? "Waiting for model…" : "Ask ORION"}</button>
           <span className="small muted">Try:</span>
           {SUGGEST.map(([k, q]) => <button key={q} className="btn" style={{ padding: "4px 10px", fontSize: "0.78rem" }} onClick={() => { setKind(k); setText(q); ask(k, q); }}>{q}</button>)}
         </div>
       </div>
 
+      {callErr && <div className="notice danger"><b>ORION request failed.</b> <span className="mono small">{callErr}</span></div>}
+      {modelResp && <ModelResponseView r={modelResp} />}
       {resp && (
         <section aria-live="polite" style={{ marginTop: 16 }}>
           <div className="panel">

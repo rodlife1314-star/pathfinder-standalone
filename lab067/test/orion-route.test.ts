@@ -26,3 +26,27 @@ test("route: request validation and no key in GET output", async () => {
   assert.equal((await POST(post({ kind: "scientific-question", text: "x".repeat(2001) }))).status, 400);
   delete process.env.ORION_API_KEY; delete process.env.ORION_BASE_URL;
 });
+
+test("route: cross-origin POST is refused before any configuration or model call", async () => {
+  const { POST } = await import("../app/api/orion/route.ts");
+  const r = await POST(new Request("http://localhost:3000/api/orion", {
+    method: "POST", headers: { "content-type": "application/json", origin: "https://evil.example", host: "localhost:3000" },
+    body: JSON.stringify({ kind: "scientific-question", text: "q" }),
+  }));
+  assert.equal(r.status, 403);
+});
+
+test("route: rate limit returns 429 with Retry-After (model call stubbed via unreachable https host)", async () => {
+  process.env.ORION_API_KEY = "nvapi-RATELIMITTEST_abcdefghijklmnop";
+  process.env.ORION_BASE_URL = "https://127.0.0.1:9/v1"; // closed port: each allowed call fails fast as "network"
+  process.env.ORION_TIMEOUT_MS = "2000";
+  const { POST } = await import("../app/api/orion/route.ts");
+  const mk = () => new Request("http://localhost/api/orion", { method: "POST", headers: { "content-type": "application/json", "x-forwarded-for": "203.0.113.9" }, body: JSON.stringify({ kind: "scientific-question", text: "q" }) });
+  const statuses: number[] = [];
+  for (let i = 0; i < 11; i++) statuses.push((await POST(mk())).status);
+  assert.deepEqual(statuses.slice(0, 10), Array(10).fill(502), "allowed calls reach the (failing) upstream");
+  const last = await POST(mk());
+  assert.equal(last.status, 429);
+  assert.ok(Number(last.headers.get("retry-after")) > 0);
+  delete process.env.ORION_API_KEY; delete process.env.ORION_BASE_URL; delete process.env.ORION_TIMEOUT_MS;
+});

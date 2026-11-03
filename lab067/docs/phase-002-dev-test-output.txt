@@ -1,0 +1,594 @@
+
+> pathfinder-lab-067@0.1.0 test
+> node --test "test/**/*.test.ts"
+
+TAP version 13
+# Subtest: only governance statuses appear
+ok 1 - only governance statuses appear
+  ---
+  duration_ms: 0.875385
+  type: 'test'
+  ...
+# Subtest: PASSED/FAILED/INCONCLUSIVE only with a recorded execution; NOT IMPLEMENTED never executed
+ok 2 - PASSED/FAILED/INCONCLUSIVE only with a recorded execution; NOT IMPLEMENTED never executed
+  ---
+  duration_ms: 0.16095
+  type: 'test'
+  ...
+# Subtest: expected Phase 001 outcomes
+ok 3 - expected Phase 001 outcomes
+  ---
+  duration_ms: 0.216545
+  type: 'test'
+  ...
+# Subtest: summary counts match checks
+ok 4 - summary counts match checks
+  ---
+  duration_ms: 0.125646
+  type: 'test'
+  ...
+# Subtest: report can be recorded to the ledger and the chain verifies
+ok 5 - report can be recorded to the ledger and the chain verifies
+  ---
+  duration_ms: 5.140032
+  type: 'test'
+  ...
+# Subtest: canonical JSON sorts keys and rejects lossy values
+ok 6 - canonical JSON sorts keys and rejects lossy values
+  ---
+  duration_ms: 1.022258
+  type: 'test'
+  ...
+# Subtest: SHA-256 known-answer test
+ok 7 - SHA-256 known-answer test
+  ---
+  duration_ms: 0.529482
+  type: 'test'
+  ...
+# Subtest: append links entries and verify passes
+ok 8 - append links entries and verify passes
+  ---
+  duration_ms: 3.759291
+  type: 'test'
+  ...
+# Subtest: deterministic hashing for identical content and clock
+ok 9 - deterministic hashing for identical content and clock
+  ---
+  duration_ms: 0.456955
+  type: 'test'
+  ...
+# Subtest: entries are immutable and detached from caller objects
+ok 10 - entries are immutable and detached from caller objects
+  ---
+  duration_ms: 0.595329
+  type: 'test'
+  ...
+# Subtest: write permissions: ORION cannot write validations; Crucible cannot write notes
+ok 11 - write permissions: ORION cannot write validations; Crucible cannot write notes
+  ---
+  duration_ms: 0.161196
+  type: 'test'
+  ...
+# Subtest: verify detects alteration, deletion, reordering and forged author
+ok 12 - verify detects alteration, deletion, reordering and forged author
+  ---
+  duration_ms: 1.453133
+  type: 'test'
+  ...
+# Subtest: fast-top formulas: sign, units-by-hand, ε
+ok 13 - fast-top formulas: sign, units-by-hand, ε
+  ---
+  duration_ms: 1.182229
+  type: 'test'
+  ...
+# Subtest: azimuth unwrapping counts full turns and handles any 'about' axis
+ok 14 - azimuth unwrapping counts full turns and handles any 'about' axis
+  ---
+  duration_ms: 1.082551
+  type: 'test'
+  ...
+# Subtest: dipole energy series: aligned m has U = −|m||B|
+ok 15 - dipole energy series: aligned m has U = −|m||B|
+  ---
+  duration_ms: 2.268604
+  type: 'test'
+  ...
+# Subtest: magnetic validator accepts a sane run and rejects bad m, B, tilt, Δt
+ok 16 - magnetic validator accepts a sane run and rejects bad m, B, tilt, Δt
+  ---
+  duration_ms: 1.253542
+  type: 'test'
+  ...
+# Subtest: magnetic conservation: E and L·B̂ pass; |L| reported as control; coarse run fails
+ok 17 - magnetic conservation: E and L·B̂ pass; |L| reported as control; coarse run fails
+  ---
+  duration_ms: 92.391232
+  type: 'test'
+  ...
+# Subtest: simulated precession direction matches the sign of the analytic rate
+ok 18 - simulated precession direction matches the sign of the analytic rate
+  ---
+  duration_ms: 36.862701
+  type: 'test'
+  ...
+# Subtest: magnetic conservation from rest (|L₀| = 0) gives finite, meaningful errors
+ok 19 - magnetic conservation from rest (|L₀| = 0) gives finite, meaningful errors
+  ---
+  duration_ms: 8.002385
+  type: 'test'
+  ...
+# Subtest: holmium record satisfies all sourcing rules
+ok 20 - holmium record satisfies all sourcing rules
+  ---
+  duration_ms: 1.454514
+  type: 'test'
+  ...
+# Subtest: no placeholder stores a value; no property claims SOURCED without verification
+ok 21 - no placeholder stores a value; no property claims SOURCED without verification
+  ---
+  duration_ms: 0.280436
+  type: 'test'
+  ...
+# Subtest: calculations cannot read placeholders
+ok 22 - calculations cannot read placeholders
+  ---
+  duration_ms: 0.419872
+  type: 'test'
+  ...
+# Subtest: rule checker catches violations
+ok 23 - rule checker catches violations
+  ---
+  duration_ms: 0.289121
+  type: 'test'
+  ...
+# Subtest: record is frozen
+ok 24 - record is frozen
+  ---
+  duration_ms: 0.138203
+  type: 'test'
+  ...
+# Subtest: cross product: basis, anticommutativity, orthogonality
+ok 25 - cross product: basis, anticommutativity, orthogonality
+  ---
+  duration_ms: 1.622659
+  type: 'test'
+  ...
+# Subtest: quaternion: 90° about z maps x→y; inverse undoes; product stays unit
+ok 26 - quaternion: 90° about z maps x→y; inverse undoes; product stays unit
+  ---
+  duration_ms: 0.39809
+  type: 'test'
+  ...
+# Subtest: inertia formulas
+ok 27 - inertia formulas
+  ---
+  duration_ms: 0.458302
+  type: 'test'
+  ...
+# Subtest: inertia admissibility rejects triangle-inequality counterexample
+ok 28 - inertia admissibility rejects triangle-inequality counterexample
+  ---
+  duration_ms: 0.265602
+  type: 'test'
+  ...
+# Subtest: Euler equations: hand-worked example
+ok 29 - Euler equations: hand-worked example
+  ---
+  duration_ms: 0.236027
+  type: 'test'
+  ...
+# Subtest: spin about a principal axis is a steady state
+ok 30 - spin about a principal axis is a steady state
+  ---
+  duration_ms: 0.109738
+  type: 'test'
+  ...
+# Subtest: energy and angular momentum
+ok 31 - energy and angular momentum
+  ---
+  duration_ms: 0.182323
+  type: 'test'
+  ...
+# Subtest: symmetric top analytic solution satisfies Euler's equations
+ok 32 - symmetric top analytic solution satisfies Euler's equations
+  ---
+  duration_ms: 0.164182
+  type: 'test'
+  ...
+# Subtest: magnetic torque: m=(0,1,0) A·m², B=(0,0,0.5) T → τ=(0.5,0,0) N·m; U = −m·B
+ok 33 - magnetic torque: m=(0,1,0) A·m², B=(0,0,0.5) T → τ=(0.5,0,0) N·m; U = −m·B
+  ---
+  duration_ms: 1.50398
+  type: 'test'
+  ...
+# Subtest: Hund's rules: Ho³⁺ 4f¹⁰ → ⁵I₈, g_J = 5/4
+ok 34 - Hund's rules: Ho³⁺ 4f¹⁰ → ⁵I₈, g_J = 5/4
+  ---
+  duration_ms: 0.494959
+  type: 'test'
+  ...
+# Subtest: Hund's rules cross-checks on other ions (independent textbook cases)
+ok 35 - Hund's rules cross-checks on other ions (independent textbook cases)
+  ---
+  duration_ms: 0.281023
+  type: 'test'
+  ...
+# Subtest: matches templates deterministically and states no model ran
+ok 36 - matches templates deterministically and states no model ran
+  ---
+  duration_ms: 2.486785
+  type: 'test'
+  ...
+# Subtest: unmatched question is reported honestly, not answered
+ok 37 - unmatched question is reported honestly, not answered
+  ---
+  duration_ms: 0.202613
+  type: 'test'
+  ...
+# Subtest: energy-generation questions get the conservation constraint
+ok 38 - energy-generation questions get the conservation constraint
+  ---
+  duration_ms: 0.170383
+  type: 'test'
+  ...
+# Subtest: short keywords need word boundaries ('ho' must not match 'how')
+ok 39 - short keywords need word boundaries ('ho' must not match 'how')
+  ---
+  duration_ms: 0.122905
+  type: 'test'
+  ...
+# Subtest: experiment proposals are HYPOTHESIS and pass the contract guard
+ok 40 - experiment proposals are HYPOTHESIS and pass the contract guard
+  ---
+  duration_ms: 0.480148
+  type: 'test'
+  ...
+# Subtest: templates contain no computed numbers claimed as results
+ok 41 - templates contain no computed numbers claimed as results
+  ---
+  duration_ms: 0.32309
+  type: 'test'
+  ...
+# Subtest: rate limiter: allows `limit` per window per client, then refuses until the window resets
+ok 42 - rate limiter: allows `limit` per window per client, then refuses until the window resets
+  ---
+  duration_ms: 1.405994
+  type: 'test'
+  ...
+# Subtest: rate limit config is bounded
+ok 43 - rate limit config is bounded
+  ---
+  duration_ms: 0.184196
+  type: 'test'
+  ...
+# Subtest: same-origin: refuses foreign Origin, allows same host and no Origin
+ok 44 - same-origin: refuses foreign Origin, allows same host and no Origin
+  ---
+  duration_ms: 23.093338
+  type: 'test'
+  ...
+# Subtest: client id prefers first forwarded address
+ok 45 - client id prefers first forwarded address
+  ---
+  duration_ms: 0.265669
+  type: 'test'
+  ...
+# Subtest: config: missing key is reported without exposing anything secret
+ok 46 - config: missing key is reported without exposing anything secret
+  ---
+  duration_ms: 6.132741
+  type: 'test'
+  ...
+# Subtest: config: rejects non-https base URL and out-of-range timeout
+ok 47 - config: rejects non-https base URL and out-of-range timeout
+  ---
+  duration_ms: 0.323975
+  type: 'test'
+  ...
+# Subtest: config: public descriptor never contains the key
+ok 48 - config: public descriptor never contains the key
+  ---
+  duration_ms: 0.157288
+  type: 'test'
+  ...
+# Subtest: request: POST to /chat/completions with bearer auth and OpenAI-compatible body
+ok 49 - request: POST to /chat/completions with bearer auth and OpenAI-compatible body
+  ---
+  duration_ms: 2.687532
+  type: 'test'
+  ...
+# Subtest: failure: timeout aborts and is reported as timeout
+ok 50 - failure: timeout aborts and is reported as timeout
+  ---
+  duration_ms: 200.568913
+  type: 'test'
+  ...
+# Subtest: failure: network error
+ok 51 - failure: network error
+  ---
+  duration_ms: 0.462654
+  type: 'test'
+  ...
+# Subtest: failure: 401 echoing the key is classified auth and redacted
+ok 52 - failure: 401 echoing the key is classified auth and redacted
+  ---
+  duration_ms: 0.30007
+  type: 'test'
+  ...
+# Subtest: failure: 403 auth, 429 rate-limited, 500 http
+ok 53 - failure: 403 auth, 429 rate-limited, 500 http
+  ---
+  duration_ms: 0.457581
+  type: 'test'
+  ...
+# Subtest: failure: non-JSON, missing choices, non-string content, empty content
+ok 54 - failure: non-JSON, missing choices, non-string content, empty content
+  ---
+  duration_ms: 0.898397
+  type: 'test'
+  ...
+# Subtest: failure: overlong error bodies are truncated
+ok 55 - failure: overlong error bodies are truncated
+  ---
+  duration_ms: 0.439836
+  type: 'test'
+  ...
+# Subtest: service: successful structured answer is ANSWERED, traced and UNVERIFIED
+ok 56 - service: successful structured answer is ANSWERED, traced and UNVERIFIED
+  ---
+  duration_ms: 2.087243
+  type: 'test'
+  ...
+# Subtest: service: API failure becomes outcome ERROR with no key in output
+ok 57 - service: API failure becomes outcome ERROR with no key in output
+  ---
+  duration_ms: 0.240407
+  type: 'test'
+  ...
+# Subtest: service: reported-model mismatch and truncation are warned in the trace
+ok 58 - service: reported-model mismatch and truncation are warned in the trace
+  ---
+  duration_ms: 0.76608
+  type: 'test'
+  ...
+# Subtest: service: model claiming ESTABLISHED_LAW is REJECTED and quarantined
+ok 59 - service: model claiming ESTABLISHED_LAW is REJECTED and quarantined
+  ---
+  duration_ms: 0.647432
+  type: 'test'
+  ...
+# Subtest: admission: self-declared validation status is rejected
+ok 60 - admission: self-declared validation status is rejected
+  ---
+  duration_ms: 0.18511
+  type: 'test'
+  ...
+# Subtest: admission: prose output is kept but forced to UNVERIFIED_AI_EXPLANATION
+ok 61 - admission: prose output is kept but forced to UNVERIFIED_AI_EXPLANATION
+  ---
+  duration_ms: 0.134511
+  type: 'test'
+  ...
+# Subtest: admission: fenced JSON is parsed
+ok 62 - admission: fenced JSON is parsed
+  ---
+  duration_ms: 0.127697
+  type: 'test'
+  ...
+# Subtest: admission: numerical statements and validation language are flagged
+ok 63 - admission: numerical statements and validation language are flagged
+  ---
+  duration_ms: 0.156954
+  type: 'test'
+  ...
+# Subtest: redaction covers common credential shapes
+ok 64 - redaction covers common credential shapes
+  ---
+  duration_ms: 0.109323
+  type: 'test'
+  ...
+# [orion] model call failed: network status=- latencyMs=2
+# [orion] model call failed: network status=- latencyMs=1
+# [orion] model call failed: network status=- latencyMs=0
+# [orion] model call failed: network status=- latencyMs=0
+# [orion] model call failed: network status=- latencyMs=0
+# [orion] model call failed: network status=- latencyMs=0
+# [orion] model call failed: network status=- latencyMs=0
+# [orion] model call failed: network status=- latencyMs=0
+# [orion] model call failed: network status=- latencyMs=0
+# [orion] model call failed: network status=- latencyMs=0
+# Subtest: route: no key configured → 503 config error; GET reports unconfigured
+ok 65 - route: no key configured → 503 config error; GET reports unconfigured
+  ---
+  duration_ms: 38.043282
+  type: 'test'
+  ...
+# Subtest: route: request validation and no key in GET output
+ok 66 - route: request validation and no key in GET output
+  ---
+  duration_ms: 2.638248
+  type: 'test'
+  ...
+# Subtest: route: cross-origin POST is refused before any configuration or model call
+ok 67 - route: cross-origin POST is refused before any configuration or model call
+  ---
+  duration_ms: 0.462874
+  type: 'test'
+  ...
+# Subtest: route: rate limit returns 429 with Retry-After (model call stubbed via unreachable https host)
+ok 68 - route: rate limit returns 429 with Retry-After (model call stubbed via unreachable https host)
+  ---
+  duration_ms: 12.429162
+  type: 'test'
+  ...
+# Subtest: well-formed proposal is admitted and forced to requireValidation
+ok 69 - well-formed proposal is admitted and forced to requireValidation
+  ---
+  duration_ms: 0.862065
+  type: 'test'
+  ...
+# Subtest: ORION cannot assert established law or measurement
+ok 70 - ORION cannot assert established law or measurement
+  ---
+  duration_ms: 0.383697
+  type: 'test'
+  ...
+# Subtest: ORION cannot declare validation or waive it
+ok 71 - ORION cannot declare validation or waive it
+  ---
+  duration_ms: 0.140081
+  type: 'test'
+  ...
+# Subtest: forbidden and unknown actions are rejected
+ok 72 - forbidden and unknown actions are rejected
+  ---
+  duration_ms: 0.184971
+  type: 'test'
+  ...
+# Subtest: recorded ORION proposals land only as orion-proposal entries
+ok 73 - recorded ORION proposals land only as orion-proposal entries
+  ---
+  duration_ms: 1.283411
+  type: 'test'
+  ...
+# Subtest: registry ids are unique and records are frozen
+ok 74 - registry ids are unique and records are frozen
+  ---
+  duration_ms: 0.958966
+  type: 'test'
+  ...
+# Subtest: no AI-recalled or computed record claims Operator verification
+ok 75 - no AI-recalled or computed record claims Operator verification
+  ---
+  duration_ms: 0.144399
+  type: 'test'
+  ...
+# Subtest: quantities carry a dimension consistent with their unit
+ok 76 - quantities carry a dimension consistent with their unit
+  ---
+  duration_ms: 0.178583
+  type: 'test'
+  ...
+# Subtest: software version matches package.json
+ok 77 - software version matches package.json
+  ---
+  duration_ms: 0.339006
+  type: 'test'
+  ...
+# Subtest: NIST FIPS 180-4 example vectors
+ok 78 - NIST FIPS 180-4 example vectors
+  ---
+  duration_ms: 1.145413
+  type: 'test'
+  ...
+# Subtest: agrees with node:crypto across padding boundaries and UTF-8
+ok 79 - agrees with node:crypto across padding boundaries and UTF-8
+  ---
+  duration_ms: 18.996871
+  type: 'test'
+  ...
+# Subtest: RK4 on y' = y reproduces e to O(h⁴)
+ok 80 - RK4 on y' = y reproduces e to O(h⁴)
+  ---
+  duration_ms: 1.088189
+  type: 'test'
+  ...
+# Subtest: simulate refuses inadmissible inputs instead of producing numbers
+ok 81 - simulate refuses inadmissible inputs instead of producing numbers
+  ---
+  duration_ms: 0.602614
+  type: 'test'
+  ...
+# Subtest: simulation record carries provenance metadata
+ok 82 - simulation record carries provenance metadata
+  ---
+  duration_ms: 1.491607
+  type: 'test'
+  ...
+# Subtest: samples carry kinetic energy and |L|; step cap enforced
+ok 83 - samples carry kinetic energy and |L|; step cap enforced
+  ---
+  duration_ms: 0.479639
+  type: 'test'
+  ...
+# Subtest: tesla × A·m² = N·m (magnetic torque)
+ok 84 - tesla × A·m² = N·m (magnetic torque)
+  ---
+  duration_ms: 6.792884
+  type: 'test'
+  ...
+# Subtest: I·ω = angular momentum, not torque
+ok 85 - I·ω = angular momentum, not torque
+  ---
+  duration_ms: 0.15305
+  type: 'test'
+  ...
+# Subtest: torque / inertia = angular acceleration; pow and format
+ok 86 - torque / inertia = angular acceleration; pow and format
+  ---
+  duration_ms: 0.20958
+  type: 'test'
+  ...
+# Subtest: documented limitation: torque and energy are dimensionally identical
+ok 87 - documented limitation: torque and energy are dimensionally identical
+  ---
+  duration_ms: 0.097816
+  type: 'test'
+  ...
+# Subtest: strict numeric parsing
+ok 88 - strict numeric parsing
+  ---
+  duration_ms: 1.479874
+  type: 'test'
+  ...
+# Subtest: Euler validator rejects nonphysical inertia and reports every error
+ok 89 - Euler validator rejects nonphysical inertia and reports every error
+  ---
+  duration_ms: 0.463374
+  type: 'test'
+  ...
+# Subtest: Euler validator accepts valid input and warns on planar limit
+ok 90 - Euler validator accepts valid input and warns on planar limit
+  ---
+  duration_ms: 0.163637
+  type: 'test'
+  ...
+# Subtest: simulation validator: step count, cap, coarse Δt
+ok 91 - simulation validator: step count, cap, coarse Δt
+  ---
+  duration_ms: 0.269869
+  type: 'test'
+  ...
+# Subtest: conservation assessment passes a good run and fails a deliberately coarse one
+ok 92 - conservation assessment passes a good run and fails a deliberately coarse one
+  ---
+  duration_ms: 17.484559
+  type: 'test'
+  ...
+# Subtest: conservation assessment is INCONCLUSIVE when torque acts
+ok 93 - conservation assessment is INCONCLUSIVE when torque acts
+  ---
+  duration_ms: 0.312746
+  type: 'test'
+  ...
+# Subtest: Operator's sign convention equals the engine form
+ok 94 - Operator's sign convention equals the engine form
+  ---
+  duration_ms: 0.860379
+  type: 'test'
+  ...
+# Subtest: intermediate values for a hand-worked case
+ok 95 - intermediate values for a hand-worked case
+  ---
+  duration_ms: 0.641496
+  type: 'test'
+  ...
+1..95
+# tests 95
+# suites 0
+# pass 95
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 946.307054

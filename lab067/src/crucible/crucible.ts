@@ -15,6 +15,8 @@ import { symmetricTopOmega } from "../physics/euler.ts";
 import { checkPrincipalInertia, solidCylinder } from "../physics/inertia.ts";
 import { fromAxisAngle, IDENTITY } from "../physics/quaternion.ts";
 import { dot, norm, scale, sub, type Vec3 } from "../physics/vec3.ts";
+import { fastTopEpsilon, fastTopPrecessionRate } from "../physics/magnetic.ts";
+import { bodyAxisInWorld, unwrappedAzimuth } from "../integration/observables.ts";
 import { REGISTRY } from "../materials/references.ts";
 import { HOLMIUM } from "../materials/holmium.ts";
 import { materialRuleViolations, requireUsableValue, PlaceholderValueError } from "../materials/material-schema.ts";
@@ -219,6 +221,35 @@ const checks: CheckDef[] = [
         status: ok ? "PASSED" : "FAILED",
         detail: `max perpendicular |ω| — minor axis: ${fmt(m1)}, intermediate: ${fmt(m2)}, major: ${fmt(m3)} rad/s.`,
         measured: { minorAxisMaxPerp: m1, intermediateAxisMaxPerp: m2, majorAxisMaxPerp: m3 },
+      };
+    },
+  },
+  {
+    id: "analytic.fast-top-precession",
+    title: "Magnetic precession matches the gyroscopic (fast-top) approximation",
+    category: "falsification",
+    method:
+      "Axisymmetric body I = (0.02, 0.02, 0.04) kg·m², m = 1 A·m² along the symmetry axis, B = 0.1 T, tilt 0.5 rad, spin ω₃ = 20 and 40 rad/s, 60 s, Δt = 2 ms. " +
+      "Measure the mean precession rate of the symmetry axis about B. Theory: Ω_p ≈ −|m||B|/(I₃ω₃) with relative correction O(ε), ε = I⊥|m||B|/(I₃ω₃)². " +
+      "Criteria: deviation < 2ε at both spins AND deviation scales as ω₃^(−p) with 1.7 ≤ p ≤ 2.3 (ε ∝ ω₃⁻²).",
+    run: () => {
+      const Ip = 0.02, I3 = 0.04, m = 1, Bz = 0.1, T = 60, dt = 2e-3;
+      const measure = (w3: number) => {
+        const p: RigidBodyParams = { inertia: [Ip, Ip, I3], magneticMomentBody: [0, 0, m], fieldWorld: [0, 0, Bz] };
+        const rec = simulate(p, { q: fromAxisAngle([1, 0, 0], 0.5), omega: [0, 0, w3] }, { dt, steps: Math.round(T / dt), sampleEvery: 5, renormalise: true });
+        const phi = unwrappedAzimuth(bodyAxisInWorld(rec.samples, [0, 0, 1]), [0, 0, 1]);
+        const meas = phi.at(-1)! / rec.samples.at(-1)!.t;
+        const theory = fastTopPrecessionRate(m, Bz, I3, w3);
+        return { meas, theory, rel: Math.abs(meas - theory) / Math.abs(theory), eps: fastTopEpsilon(Ip, I3, m, Bz, w3) };
+      };
+      const a = measure(20), b = measure(40);
+      const pExp = Math.log2(a.rel / b.rel);
+      const ok = a.rel < 2 * a.eps && b.rel < 2 * b.eps && pExp >= 1.7 && pExp <= 2.3;
+      return {
+        status: ok ? "PASSED" : "FAILED",
+        detail: `ω₃=20: measured ${a.meas.toFixed(5)} vs theory ${a.theory.toFixed(5)} rad/s (deviation ${fmt(a.rel)}, ε ${fmt(a.eps)}); ` +
+          `ω₃=40: ${b.meas.toFixed(5)} vs ${b.theory.toFixed(5)} (deviation ${fmt(b.rel)}, ε ${fmt(b.eps)}); scaling exponent ${pExp.toFixed(2)}.`,
+        measured: { measured20: a.meas, theory20: a.theory, rel20: a.rel, eps20: a.eps, measured40: b.meas, theory40: b.theory, rel40: b.rel, eps40: b.eps, scalingExponent: pExp },
       };
     },
   },

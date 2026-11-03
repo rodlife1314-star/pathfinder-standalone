@@ -148,3 +148,12 @@ NOT TESTED items: [PHASE-002A-ORION-MODEL.md](./PHASE-002A-ORION-MODEL.md).
 
 7. Is the model admission design (contract guard reuse, reject-not-repair, quarantined raw text, numeric flagging) adequate before any real use?
 8. Should `/api/orion` require authentication or rate limiting before Phase 002?
+
+## Addendum (2026-11-03): Phase 002 development increment
+
+Branch `lab067/phase-002-dev`: magnetic torque in the Dynamics Lab (new falsification check
+`analytic.fast-top-precession`, tolerance derived from measured ε-scaling) and `/api/orion` rate limiting / origin
+checks. Unmerged and unreviewed. Details: [PHASE-002-DEV.md](./PHASE-002-DEV.md).
+
+9. Is a fast-top (gyroscopic) comparison an adequate independent reference for the magnetic-torque path, or is an exact Lagrange-top solution required?
+10. Is an in-memory, per-process rate limit acceptable for development, and what authentication should precede any shared deployment?

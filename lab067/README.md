@@ -5,11 +5,13 @@ incorporating holmium (Element 67)**, starting from Euler's rigid-body equations
 The disk is an **exploratory hypothesis, not an established or working device**.
 Governed by [GOVERNANCE.md](./GOVERNANCE.md). Architecture handover:
 [docs/HANDOVER-JEMMA-PHASE-001.md](./docs/HANDOVER-JEMMA-PHASE-001.md).
+Development work beyond Phase 001: [PHASE-002A-ORION-MODEL.md](./docs/PHASE-002A-ORION-MODEL.md),
+[PHASE-002-DEV.md](./docs/PHASE-002-DEV.md) (unreviewed, unmerged).
 
 ```bash
 cd lab067
 npm install
-npm test            # 61 tests, node:test (no test framework dependency)
+npm test            # 95 tests, node:test (no test framework dependency)
 npm run typecheck
 npm run build && npm start        # http://localhost:3000
 ```
@@ -25,9 +27,9 @@ Next.js telemetry is disabled in every npm script.
 | `/` | Research Dashboard | Hypothesis status, live Crucible summary, constraints, gaps |
 | `/materials` | Element 67 Registry | 0 sourced · 2 definitional · 4 derived · 11 placeholders; Operator proposal form → ledger |
 | `/workbench` | Euler Equation Workbench | Working calculator, intermediate values, strict validation |
-| `/simulation` | Dynamics Simulation Lab | Torque-free RK4, charts, conservation errors, step-halving estimate |
+| `/simulation` | Dynamics Simulation Lab | RK4: torque-free or fixed dipole in uniform B; conservation errors, precession vs fast-top theory |
 | `/orion` | ORION Reasoning Console | Static templates + keyword match; **no AI model**; full trace |
-| `/crucible` | Scientific Crucible | 19 checks run in-browser: 13 PASSED, 1 FAILED, 5 NOT IMPLEMENTED |
+| `/crucible` | Scientific Crucible | 20 checks run in-browser: 14 PASSED, 1 FAILED, 5 NOT IMPLEMENTED |
 | `/ledger` | Evidence Ledger | Hash-linked, **in-browser memory only (lost on reload)** |
 
 ## Source layout

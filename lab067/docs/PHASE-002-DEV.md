@@ -37,7 +37,7 @@ exerts zero net force.
 
 | Test | Result |
 |---|---|
-| `npm test` | **95 / 95 pass** (log: `docs/phase-002-dev-test-output.txt`) |
+| `npm test` | **95 / 95 pass** at the time of this increment (current log: `docs/phase-002-dev-test-output.txt`) |
 | Crucible | 20 checks: **14 PASSED, 1 FAILED** (prov.sourced-data — expected), **5 NOT IMPLEMENTED** |
 | Browser — fast spin preset | E drift 1.15e-11, L·B̂ 3.05e-10 (PASSED); precession −0.124638 vs −0.125 rad/s, deviation 2.89e-3 ≈ ε 3.12e-3 |
 | Browser — slow spin preset | Conservation PASSED; approximation correctly flagged inapplicable (ε = 0.14) |
@@ -48,6 +48,6 @@ exerts zero net force.
 
 ## 4. Still not implemented / not tested
 
-- Live call to the NVIDIA model: NOT TESTED (host blocked by this session's network policy).
+- Live ORION model calls: NOT TESTED (see ORION-PROVIDERS.md; the earlier single-vendor endpoint was removed).
 - Holmium magnetisation model; field gradients / forces; suspension and stability analysis; cryogenic model; durable ledger.
 - Citations for the fast-top result and the other classical statements.

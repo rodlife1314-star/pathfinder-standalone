@@ -78,7 +78,7 @@ export function OrionConsole() {
             <label className="row" style={{ gap: 6 }}><input type="radio" name="mode" checked={mode === "templates"} onChange={() => setMode("templates")} /> Static templates (offline, no model)</label>
             <label className="row" style={{ gap: 6 }}>
               <input type="radio" name="mode" checked={mode === "model"} disabled={!desc?.configured} onChange={() => setMode("model")} />
-              Language model {desc ? <span className="mono small">{desc.model} @ {desc.provider}</span> : "(checking…)"}
+              Language model {desc ? (desc.configured ? <span className="mono small">{desc.provider}: {desc.model} @ {desc.host}</span> : <span className="small muted">(not configured)</span>) : "(checking…)"}
             </label>
           </div>
           {desc && !desc.configured && <p className="small muted" style={{ marginBottom: 0 }}>Model mode unavailable: {desc.reason ?? "not configured on the server"}.</p>}

@@ -2,7 +2,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-const KEY = "nvapi-ROUTETEST_abcdefghijklmnopqrstuvwxyz";
+const KEY = "sk-ROUTETEST_abcdefghijklmnopqrstuvwxyz";
 const post = (body: unknown) => new Request("http://localhost/api/orion", { method: "POST", headers: { "content-type": "application/json" }, body: typeof body === "string" ? body : JSON.stringify(body) });
 
 test("route: no key configured → 503 config error; GET reports unconfigured", async () => {
@@ -15,6 +15,8 @@ test("route: no key configured → 503 config error; GET reports unconfigured", 
 });
 
 test("route: request validation and no key in GET output", async () => {
+  process.env.ORION_PROVIDER = "openai-compatible";
+  process.env.ORION_MODEL = "test-model";
   process.env.ORION_API_KEY = KEY;
   process.env.ORION_BASE_URL = "https://example.invalid/v1";
   const { GET, POST } = await import("../app/api/orion/route.ts");
@@ -24,7 +26,7 @@ test("route: request validation and no key in GET output", async () => {
   assert.equal((await POST(post({ kind: "declare-validated", text: "x" }))).status, 400);
   assert.equal((await POST(post({ kind: "scientific-question", text: "  " }))).status, 400);
   assert.equal((await POST(post({ kind: "scientific-question", text: "x".repeat(2001) }))).status, 400);
-  delete process.env.ORION_API_KEY; delete process.env.ORION_BASE_URL;
+  delete process.env.ORION_API_KEY; delete process.env.ORION_BASE_URL; delete process.env.ORION_PROVIDER; delete process.env.ORION_MODEL;
 });
 
 test("route: cross-origin POST is refused before any configuration or model call", async () => {
@@ -37,7 +39,9 @@ test("route: cross-origin POST is refused before any configuration or model call
 });
 
 test("route: rate limit returns 429 with Retry-After (model call stubbed via unreachable https host)", async () => {
-  process.env.ORION_API_KEY = "nvapi-RATELIMITTEST_abcdefghijklmnop";
+  process.env.ORION_PROVIDER = "openai-compatible";
+  process.env.ORION_MODEL = "test-model";
+  process.env.ORION_API_KEY = "sk-RATELIMITTEST_abcdefghijklmnop";
   process.env.ORION_BASE_URL = "https://127.0.0.1:9/v1"; // closed port: each allowed call fails fast as "network"
   process.env.ORION_TIMEOUT_MS = "2000";
   const { POST } = await import("../app/api/orion/route.ts");
@@ -48,5 +52,5 @@ test("route: rate limit returns 429 with Retry-After (model call stubbed via unr
   const last = await POST(mk());
   assert.equal(last.status, 429);
   assert.ok(Number(last.headers.get("retry-after")) > 0);
-  delete process.env.ORION_API_KEY; delete process.env.ORION_BASE_URL; delete process.env.ORION_TIMEOUT_MS;
+  for (const k of ["ORION_API_KEY", "ORION_BASE_URL", "ORION_TIMEOUT_MS", "ORION_PROVIDER", "ORION_MODEL"]) delete process.env[k];
 });

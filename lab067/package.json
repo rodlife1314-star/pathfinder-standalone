@@ -11,7 +11,8 @@
     "build": "NEXT_TELEMETRY_DISABLED=1 next build",
     "start": "NEXT_TELEMETRY_DISABLED=1 next start",
     "typecheck": "tsc --noEmit",
-    "test": "node --test \"test/**/*.test.ts\""
+    "test": "node --test \"test/**/*.test.ts\"",
+    "orion:eval": "node --env-file-if-exists=.env.local scripts/orion-eval.ts"
   },
   "dependencies": {
     "next": "16.4.5",

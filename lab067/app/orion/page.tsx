@@ -11,8 +11,8 @@ export default function OrionPage() {
       <h1>ORION Reasoning Console</h1>
       <p className="lede">A transparent, non-autonomous console for reasoning and hypothesis generation. It answers only when asked, takes no actions, and every response shows its trace.</p>
       <div className="notice info">
-        <b>Two sources.</b> <i>Static templates</i>: {KNOWLEDGE.length} pre-written topics matched by keyword; no model. <i>Language model</i> (Phase 002a development branch only):
-        an external OpenAI-compatible endpoint called from the server; the key never reaches the browser. Either way, output is UNVERIFIED_AI_EXPLANATION or HYPOTHESIS,
+        <b>Two sources.</b> <i>Static templates</i>: {KNOWLEDGE.length} pre-written topics matched by keyword; no model. <i>Language model</i> (development branch only):
+        a provider chosen by the Operator (Anthropic, OpenAI, Gemini or a generic OpenAI-compatible endpoint) called from the server through a provider-independent adapter; the key never reaches the browser. Either way, output is UNVERIFIED_AI_EXPLANATION or HYPOTHESIS,
         passes the contract guard, and is not evaluated by the Crucible. ORION never computes numbers — use the Workbench and Dynamics Lab.
       </div>
       <OrionConsole />

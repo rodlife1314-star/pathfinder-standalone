@@ -143,8 +143,9 @@ magnetic torque in the Dynamics Lab UI. Out of scope by governance: hardware con
 ## Addendum (2026-11-03): Phase 002a on a separate branch
 
 After this handover was written, the Operator authorised an isolated ORION language-model integration on branch
-`lab067/orion-llm-dev`, before this review. It is **not** part of the Phase 001 baseline. Details, evidence and
-NOT TESTED items: [PHASE-002A-ORION-MODEL.md](./PHASE-002A-ORION-MODEL.md).
+`lab067/orion-llm-dev`, before this review. It is **not** part of the Phase 001 baseline. Its single-vendor
+endpoint was later removed by Operator directive and replaced by a provider-independent adapter on
+`lab067/phase-002-dev` — see [ORION-PROVIDERS.md](./ORION-PROVIDERS.md).
 
 7. Is the model admission design (contract guard reuse, reject-not-repair, quarantined raw text, numeric flagging) adequate before any real use?
 8. Should `/api/orion` require authentication or rate limiting before Phase 002?
@@ -157,3 +158,12 @@ checks. Unmerged and unreviewed. Details: [PHASE-002-DEV.md](./PHASE-002-DEV.md)
 
 9. Is a fast-top (gyroscopic) comparison an adequate independent reference for the magnetic-torque path, or is an exact Lagrange-top solution required?
 10. Is an in-memory, per-process rate limit acceptable for development, and what authentication should precede any shared deployment?
+
+## Addendum (2026-11-03): ORION provider-independent adapter
+
+Operator directive: remove the previous single-vendor endpoint; evaluate replacement models; separate ORION's
+contract from the provider. Delivered on `lab067/phase-002-dev`: [ORION-PROVIDERS.md](./ORION-PROVIDERS.md).
+Live model evaluation is NOT TESTED (no credentials; provider hosts partly blocked). Not reviewed.
+
+11. Is the provider boundary (`src/orion/providers/types.ts`) narrow enough — in particular, should providers be isolated in a separate server process?
+12. Are deterministic graders (verdict enum + engine-computed numeric references) an adequate acceptance test for a reasoning model, and what pass threshold should gate approval?

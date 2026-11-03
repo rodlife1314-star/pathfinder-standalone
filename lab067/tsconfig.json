@@ -28,6 +28,7 @@
     "allowJs": true
   },
   "include": [
+    "scripts",
     "next-env.d.ts",
     "src",
     "app",

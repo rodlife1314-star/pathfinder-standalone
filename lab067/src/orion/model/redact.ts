@@ -4,10 +4,10 @@
  * error bodies can echo a key back, so all text passes through here.
  */
 const PATTERNS: RegExp[] = [
-  /nvapi-[A-Za-z0-9_-]{8,}/g,
-  /sk-[A-Za-z0-9_-]{16,}/g,
+  /sk-(?:ant-|proj-)?[A-Za-z0-9_-]{16,}/g,
+  /AIza[0-9A-Za-z_-]{20,}/g,
   /Bearer\s+[A-Za-z0-9._~+/=-]{8,}/gi,
-  /"?(api[_-]?key|authorization)"?\s*[:=]\s*"?[^\s",}]{6,}/gi,
+  /"?(api[_-]?key|authorization|x-api-key|x-goog-api-key)"?\s*[:=]\s*"?[^\s",}]{6,}/gi,
 ];
 
 export function redact(text: string, secrets: readonly string[] = []): string {

@@ -1,0 +1,31 @@
+:root {
+  --bg: #fbfbf9; --fg: #1b1d21; --muted: #5d6470; --line: #d9dcd3; --panel: #ffffff;
+  --pass: #1f7a3d; --fail: #b3261e; --inc: #8a5a00; --ni: #5d6470; --accent: #2d4f8a;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #15171a; --fg: #e6e7e3; --muted: #9aa1ab; --line: #2e3238; --panel: #1c1f23;
+    --pass: #5cc27e; --fail: #ff8a80; --inc: #e0b25a; --ni: #9aa1ab; --accent: #8fb0ea; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 980px; margin: 0 auto; padding: 24px 16px 64px; }
+header.top { border-bottom: 1px solid var(--line); padding: 12px 16px; display: flex; gap: 20px; align-items: baseline; flex-wrap: wrap; }
+header.top strong { letter-spacing: 0.04em; }
+header.top a { color: var(--accent); text-decoration: none; }
+h1 { font-size: 1.6rem; margin: 0.4em 0 0.2em; }
+h2 { font-size: 1.15rem; margin-top: 2em; border-bottom: 1px solid var(--line); padding-bottom: 4px; }
+h3 { font-size: 1rem; margin-top: 1.4em; }
+p.lede { color: var(--muted); margin-top: 0; }
+code, .mono { font-family: var(--mono); font-size: 0.92em; }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+th, td { text-align: left; vertical-align: top; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+th { color: var(--muted); font-weight: 600; }
+.status { font-family: var(--mono); font-weight: 700; font-size: 0.8rem; white-space: nowrap; }
+.s-PASSED { color: var(--pass); } .s-FAILED { color: var(--fail); } .s-INCONCLUSIVE { color: var(--inc); }
+.s-NOT-IMPLEMENTED, .s-NOT-TESTED { color: var(--ni); }
+.notice { border: 1px solid var(--line); border-left: 4px solid var(--inc); background: var(--panel); padding: 10px 14px; margin: 16px 0; }
+.eq { font-family: var(--mono); background: var(--panel); border: 1px solid var(--line); padding: 10px 14px; overflow-x: auto; white-space: pre; }
+.small { font-size: 0.85rem; color: var(--muted); }
+details summary { cursor: pointer; }

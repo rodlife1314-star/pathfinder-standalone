@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { REGISTRY } from "../src/registry/references.ts";
+import { REGISTRY } from "../src/materials/references.ts";
 import { LAB_VERSION } from "../src/contracts/version.ts";
 import { D, sameDim } from "../src/units/dimension.ts";
 
@@ -20,7 +20,7 @@ test("no AI-recalled or computed record claims Operator verification", () => {
 });
 
 test("quantities carry a dimension consistent with their unit", () => {
-  const unitDims: Record<string, readonly number[]> = { K: D.temperature, "J/T": D.magneticMoment, "1": D.dimensionless, "μ_B": D.dimensionless };
+  const unitDims: Record<string, readonly number[]> = { "J/T": D.magneticMoment };
   for (const r of REGISTRY) {
     if (!r.quantity) continue;
     const expected = unitDims[r.quantity.unit];

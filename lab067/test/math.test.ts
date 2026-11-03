@@ -1,14 +1,14 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { cross, dot, norm, type Vec3 } from "../src/math/vec3.ts";
-import { fromAxisAngle, qmul, qnorm, rotate, rotateInverse } from "../src/math/quaternion.ts";
-import { checkPrincipalInertia, solidCuboid, solidCylinder, solidSphere } from "../src/math/inertia.ts";
+import { cross, dot, norm, type Vec3 } from "../src/physics/vec3.ts";
+import { fromAxisAngle, qmul, qnorm, rotate, rotateInverse } from "../src/physics/quaternion.ts";
+import { checkPrincipalInertia, solidCuboid, solidCylinder, solidSphere } from "../src/physics/inertia.ts";
 import {
   angularMomentumBody, eulerAngularAcceleration, gyroscopicTerm, rotationalKineticEnergy,
   symmetricTopBodyPrecessionRate, symmetricTopOmega,
-} from "../src/math/euler.ts";
-import { dipolePotentialEnergy, magneticTorque } from "../src/math/magnetic.ts";
-import { hund4f } from "../src/math/hund.ts";
+} from "../src/physics/euler.ts";
+import { dipolePotentialEnergy, magneticTorque } from "../src/physics/magnetic.ts";
+import { hund4f } from "../src/physics/hund.ts";
 
 const close = (a: number, b: number, tol = 1e-12) => assert.ok(Math.abs(a - b) <= tol, `${a} ≉ ${b}`);
 const closeV = (a: Vec3, b: Vec3, tol = 1e-12) => a.forEach((x, i) => close(x, b[i]!, tol));

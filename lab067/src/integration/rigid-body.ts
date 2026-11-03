@@ -12,11 +12,11 @@
  */
 import { SCHEMA } from "../contracts/evidence.ts";
 import { LAB_VERSION } from "../contracts/version.ts";
-import { eulerAngularAcceleration, angularMomentumBody, rotationalKineticEnergy } from "../math/euler.ts";
-import { checkPrincipalInertia } from "../math/inertia.ts";
-import { dipolePotentialEnergy, magneticTorque } from "../math/magnetic.ts";
-import { qdot, qnorm, qnormalize, rotate, rotateInverse, type Quat } from "../math/quaternion.ts";
-import { isFiniteVec, type Vec3 } from "../math/vec3.ts";
+import { eulerAngularAcceleration, angularMomentumBody, rotationalKineticEnergy } from "../physics/euler.ts";
+import { checkPrincipalInertia } from "../physics/inertia.ts";
+import { dipolePotentialEnergy, magneticTorque } from "../physics/magnetic.ts";
+import { qdot, qnorm, qnormalize, rotate, rotateInverse, type Quat } from "../physics/quaternion.ts";
+import { isFiniteVec, norm, type Vec3 } from "../physics/vec3.ts";
 import { rk4Step } from "./rk4.ts";
 
 export interface RigidBodyParams {
@@ -47,8 +47,13 @@ export interface Sample {
   t: number;
   q: Quat;
   omega: Vec3;
+  /** Total energy E = T + U [J]; equals T when B = 0. */
   energy: number;
+  /** Rotational kinetic energy T = ½ ω·Iω [J]. */
+  kineticEnergy: number;
   angularMomentumWorld: Vec3;
+  /** |L| [kg·m²/s] — frame-independent magnitude. */
+  angularMomentumMagnitude: number;
 }
 
 export interface SimulationRecord {
@@ -70,6 +75,9 @@ export const ASSUMPTIONS = [
   "Inertial world frame, non-relativistic",
 ] as const;
 
+/** Hard cap on integration steps so an interactive run cannot freeze the browser. */
+export const MAX_STEPS = 200_000;
+
 export function validateInputs(p: RigidBodyParams, s: RigidBodyState, c: RunConfig): string[] {
   const errs: string[] = [...checkPrincipalInertia(p.inertia).reasons];
   if (!isFiniteVec(p.magneticMomentBody)) errs.push("magnetic moment not finite");
@@ -78,6 +86,7 @@ export function validateInputs(p: RigidBodyParams, s: RigidBodyState, c: RunConf
   if (!s.q.every(Number.isFinite) || Math.abs(qnorm(s.q) - 1) > 1e-9) errs.push("initial q must be a unit quaternion");
   if (!(Number.isFinite(c.dt) && c.dt > 0)) errs.push("dt must be > 0");
   if (!(Number.isInteger(c.steps) && c.steps >= 1)) errs.push("steps must be a positive integer");
+  else if (c.steps > MAX_STEPS) errs.push(`steps ${c.steps} exceeds the cap of ${MAX_STEPS}`);
   if (!(Number.isInteger(c.sampleEvery) && c.sampleEvery >= 1)) errs.push("sampleEvery must be a positive integer");
   return errs;
 }
@@ -98,9 +107,16 @@ function derivative(p: RigidBodyParams) {
   };
 }
 
-const sample = (p: RigidBodyParams, t: number, s: RigidBodyState): Sample => ({
-  t, q: s.q, omega: s.omega, energy: totalEnergy(p, s), angularMomentumWorld: angularMomentumWorld(p, s),
-});
+function sample(p: RigidBodyParams, t: number, s: RigidBodyState): Sample {
+  const L = angularMomentumWorld(p, s);
+  return {
+    t, q: s.q, omega: s.omega,
+    energy: totalEnergy(p, s),
+    kineticEnergy: rotationalKineticEnergy(p.inertia, s.omega),
+    angularMomentumWorld: L,
+    angularMomentumMagnitude: norm(L),
+  };
+}
 
 export function simulate(params: RigidBodyParams, initial: RigidBodyState, config: RunConfig): SimulationRecord {
   const errs = validateInputs(params, initial, config);

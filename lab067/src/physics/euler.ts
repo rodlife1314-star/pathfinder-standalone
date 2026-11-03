@@ -47,3 +47,61 @@ export function symmetricTopOmega(Iperp: number, I3: number, omega0: Vec3, t: nu
   const c = Math.cos(Omega * t), s = Math.sin(Omega * t);
   return [omega0[0] * c - omega0[1] * s, omega0[0] * s + omega0[1] * c, omega0[2]];
 }
+
+/**
+ * Per-axis breakdown in the Operator's sign convention (Phase 001 brief):
+ *
+ *   I₁ ω̇₁ = τ₁ − (I₃ − I₂) ω₂ ω₃
+ *   I₂ ω̇₂ = τ₂ − (I₁ − I₃) ω₃ ω₁
+ *   I₃ ω̇₃ = τ₃ − (I₂ − I₁) ω₁ ω₂
+ *
+ * Algebraically identical to eulerAngularAcceleration (tested). Every
+ * intermediate value is exposed so the workbench can show the working.
+ */
+export interface EulerAxisWorking {
+  axis: 1 | 2 | 3;
+  /** I_i [kg·m²] */
+  inertia: number;
+  /** (I_k − I_j) [kg·m²], e.g. (I₃ − I₂) for axis 1 */
+  inertiaDifference: number;
+  /** ω_j ω_k [rad²/s²] */
+  omegaProduct: number;
+  /** (I_k − I_j) ω_j ω_k  [N·m] — the gyroscopic coupling term (component of ω × Iω) */
+  gyroscopicTerm: number;
+  /** τ_i [N·m] */
+  torque: number;
+  /** τ_i − gyroscopic term [N·m] */
+  netEffectiveTorque: number;
+  /** ω̇_i [rad/s²] */
+  angularAcceleration: number;
+}
+
+export interface EulerWorking {
+  axes: [EulerAxisWorking, EulerAxisWorking, EulerAxisWorking];
+  angularMomentumBody: Vec3;
+  angularMomentumMagnitude: number;
+  kineticEnergy: number;
+}
+
+export function eulerWorking(I: Vec3, omega: Vec3, torque: Vec3): EulerWorking {
+  // cyclic index triples (i, j, k): axis i couples ω_j ω_k with (I_k − I_j)
+  const triples = [[0, 1, 2], [1, 2, 0], [2, 0, 1]] as const;
+  const axes = triples.map(([i, j, k]) => {
+    const inertiaDifference = I[k] - I[j];
+    const omegaProduct = omega[j] * omega[k];
+    const gyroscopicTerm = inertiaDifference * omegaProduct;
+    const netEffectiveTorque = torque[i] - gyroscopicTerm;
+    return {
+      axis: (i + 1) as 1 | 2 | 3,
+      inertia: I[i],
+      inertiaDifference,
+      omegaProduct,
+      gyroscopicTerm,
+      torque: torque[i],
+      netEffectiveTorque,
+      angularAcceleration: netEffectiveTorque / I[i],
+    };
+  }) as EulerWorking["axes"];
+  const L = angularMomentumBody(I, omega);
+  return { axes, angularMomentumBody: L, angularMomentumMagnitude: Math.hypot(...L), kineticEnergy: rotationalKineticEnergy(I, omega) };
+}

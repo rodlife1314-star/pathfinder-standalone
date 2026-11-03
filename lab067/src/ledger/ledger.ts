@@ -6,24 +6,32 @@
  * Entries are deep-frozen; the API exposes no update or delete.
  *
  * WHAT IS NOT (do not claim otherwise):
- *   - Durable persistence: storage is in-memory and lost on process exit.
+ *   - Durable persistence: storage is in-memory (browser tab or server request)
+ *     and lost on reload / process exit.
  *   - Tamper-PROOFING: the chain is tamper-EVIDENT only. Someone with write
  *     access to the storage could rewrite and re-hash the entire chain. External
  *     anchoring (e.g. Operator-held head-hash receipts) is not implemented.
  *   - Signatures / author authentication: `author` is a declared field, not a proof.
  */
-import { createHash } from "node:crypto";
+import { sha256Hex } from "./sha256.ts";
 import { SCHEMA } from "../contracts/evidence.ts";
 import { LAB_VERSION } from "../contracts/version.ts";
 import { canonicalJSON } from "./canonical.ts";
 
 export type LedgerAuthor = "operator" | "engine" | "crucible" | "orion";
-export type LedgerKind = "reference-snapshot" | "simulation" | "validation" | "orion-proposal" | "operator-note";
+export type LedgerKind =
+  | "reference-snapshot"
+  | "calculation"
+  | "simulation"
+  | "validation"
+  | "orion-proposal"
+  | "operator-note"
+  | "operator-data-submission";
 
 /** Which authors may write which kinds. Enforces the ORION and Crucible boundaries. */
 export const WRITE_PERMISSIONS: Readonly<Record<LedgerAuthor, readonly LedgerKind[]>> = Object.freeze({
-  operator: ["operator-note", "reference-snapshot"],
-  engine: ["simulation", "reference-snapshot"],
+  operator: ["operator-note", "operator-data-submission", "reference-snapshot"],
+  engine: ["calculation", "simulation", "reference-snapshot"],
   crucible: ["validation"],
   orion: ["orion-proposal"],
 });
@@ -53,7 +61,7 @@ export interface VerifyResult {
   reason: string | null;
 }
 
-export const sha256Hex = (s: string): string => createHash("sha256").update(s, "utf8").digest("hex");
+export { sha256Hex };
 
 export const hashEntryBody = (b: LedgerEntryBody): string => sha256Hex(canonicalJSON(b));
 

@@ -11,12 +11,17 @@
  */
 import { SCHEMA, VALIDATION_STATUSES, type ValidationStatus } from "../contracts/evidence.ts";
 import { LAB_VERSION } from "../contracts/version.ts";
-import { symmetricTopOmega } from "../math/euler.ts";
-import { checkPrincipalInertia, solidCylinder } from "../math/inertia.ts";
-import { fromAxisAngle, IDENTITY } from "../math/quaternion.ts";
-import { dot, norm, scale, sub, type Vec3 } from "../math/vec3.ts";
-import { REGISTRY } from "../registry/references.ts";
-import { simulate, validateInputs, type RigidBodyParams, type RigidBodyState, type RunConfig } from "../sim/rigid-body.ts";
+import { symmetricTopOmega } from "../physics/euler.ts";
+import { checkPrincipalInertia, solidCylinder } from "../physics/inertia.ts";
+import { fromAxisAngle, IDENTITY } from "../physics/quaternion.ts";
+import { dot, norm, scale, sub, type Vec3 } from "../physics/vec3.ts";
+import { REGISTRY } from "../materials/references.ts";
+import { HOLMIUM } from "../materials/holmium.ts";
+import { materialRuleViolations, requireUsableValue, PlaceholderValueError } from "../materials/material-schema.ts";
+import { eulerAngularAcceleration as engineAccel, eulerWorking } from "../physics/euler.ts";
+import { parseNumericField, validateEulerInputs, validateSimulationInputs } from "./validators.ts";
+import { admitOrionProposal, OrionContractViolation } from "../orion/contract.ts";
+import { simulate, validateInputs, type RigidBodyParams, type RigidBodyState, type RunConfig } from "../integration/rigid-body.ts";
 import { canonicalJSON } from "../ledger/canonical.ts";
 import { EvidenceLedger, sha256Hex, verifyChain, type LedgerEntry } from "../ledger/ledger.ts";
 import { D, divDim, formatDim, mulDim, sameDim } from "../units/dimension.ts";
@@ -232,22 +237,118 @@ const checks: CheckDef[] = [
     },
   },
   {
-    id: "prov.registry-citations",
-    title: "Every registry value is backed by an Operator-verified citation",
-    category: "provenance",
-    method: "Count registry entries by citation status. PASSED only if all are OPERATOR_VERIFIED; FAILED if any has no source at all; otherwise INCONCLUSIVE.",
+    id: "inputs.validator-rejects-invalid",
+    title: "Input validators reject non-numeric and nonphysical inputs",
+    category: "initial-boundary",
+    method:
+      "Feed the Workbench/Simulation validators known-bad inputs: empty string, \"abc\", \"0x10\", \"Infinity\", \"1e400\", " +
+      "zero and negative inertia, I = (1, 1, 3), Δt = 0, and an over-long run. Each must be rejected; one valid input must be accepted.",
     run: () => {
-      const n = REGISTRY.length;
-      const verified = REGISTRY.filter((r) => r.citation.status === "OPERATOR_VERIFIED").length;
-      const unchecked = REGISTRY.filter((r) => r.citation.status === "IDENTIFIED_UNCHECKED").length;
-      const none = REGISTRY.filter((r) => r.citation.status === "NONE");
-      const status: ValidationStatus = none.length > 0 ? "FAILED" : verified === n ? "PASSED" : "INCONCLUSIVE";
+      const bad = ["", "  ", "abc", "0x10", "Infinity", "1e400", "1,5", "NaN"];
+      const parsedBad = bad.filter((b) => parseNumericField(b, "x").ok);
+      const goodParse = ["1", "-2.5", "3e-4", ".5", "+7E2"].every((g) => parseNumericField(g, "x").ok);
+      const z = ["0", "0", "0"] as const;
+      const eb = (I: [string, string, string]) => validateEulerInputs({ inertia: I, omega: z, torque: z }).status === "FAILED";
+      const eulerRejects = [eb(["0", "1", "1"]), eb(["-1", "2", "2"]), eb(["1", "1", "3"]), eb(["1", "", "1"])];
+      const eulerAccepts = validateEulerInputs({ inertia: ["1", "2", "2.5"], omega: ["0.1", "0", "5"], torque: z }).status === "PASSED";
+      const sb = (dur: string, dt: string) => validateSimulationInputs({ inertia: ["1", "2", "2.5"], omega: ["0", "0", "1"], duration: dur, dt }).status === "FAILED";
+      const simRejects = [sb("10", "0"), sb("-1", "0.01"), sb("1e6", "0.001")];
+      const ok = parsedBad.length === 0 && goodParse && eulerRejects.every(Boolean) && eulerAccepts && simRejects.every(Boolean);
+      return {
+        status: ok ? "PASSED" : "FAILED",
+        detail: `bad strings accepted: ${parsedBad.length ? parsedBad.map((x) => JSON.stringify(x)).join(", ") : "none"}; ` +
+          `valid numbers accepted: ${goodParse}; nonphysical inertia rejected: ${eulerRejects.filter(Boolean).length}/4; ` +
+          `valid Euler input accepted: ${eulerAccepts}; bad simulation configs rejected: ${simRejects.filter(Boolean).length}/3.`,
+      };
+    },
+  },
+  {
+    id: "math.workbench-form-equivalence",
+    title: "Workbench equation form agrees with the engine",
+    category: "dimensional",
+    method:
+      "The Workbench uses I_iω̇_i = τ_i − (I_k − I_j)ω_jω_k; the integrator uses (I_j − I_k)ω_jω_k + τ_i. " +
+      "Compare both on 1000 deterministic pseudo-random admissible inputs; criterion max relative difference < 1e-12.",
+    run: () => {
+      let seed = 67;
+      const rnd = () => ((seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648);
+      let maxRel = 0;
+      for (let n = 0; n < 1000; n++) {
+        const a = 0.1 + rnd(), b = 0.1 + rnd();
+        const I: Vec3 = [a, b, Math.abs(a - b) + rnd() * (a + b - Math.abs(a - b))];
+        const w: Vec3 = [rnd() * 20 - 10, rnd() * 20 - 10, rnd() * 20 - 10];
+        const tau: Vec3 = [rnd() - 0.5, rnd() - 0.5, rnd() - 0.5];
+        const e1 = engineAccel(I, w, tau);
+        const e2 = eulerWorking(I, w, tau).axes.map((x) => x.angularAcceleration);
+        for (let i = 0; i < 3; i++) maxRel = Math.max(maxRel, Math.abs(e1[i]! - e2[i]!) / Math.max(1e-300, Math.abs(e1[i]!)));
+      }
+      return { status: maxRel < 1e-12 ? "PASSED" : "FAILED", detail: `max relative difference ${fmt(maxRel)} over 1000 inputs.`, measured: { maxRelativeDifference: maxRel } };
+    },
+  },
+  {
+    id: "prov.material-rules",
+    title: "Material record obeys sourcing rules (no unsourced measurements stored)",
+    category: "provenance",
+    method:
+      "Every PLACEHOLDER must have a null value; SOURCED requires an https URL and Operator verification; DERIVED requires a stated derivation. " +
+      "Calculations must be unable to read a PLACEHOLDER (requireUsableValue must throw).",
+    run: () => {
+      const v = materialRuleViolations(HOLMIUM);
+      const ph = HOLMIUM.properties.find((p) => p.status === "PLACEHOLDER");
+      let guarded = false;
+      try { if (ph) requireUsableValue(ph); } catch (e) { guarded = e instanceof PlaceholderValueError; }
+      const ok = v.length === 0 && guarded;
+      return {
+        status: ok ? "PASSED" : "FAILED",
+        detail: `${v.length} rule violations${v.length ? `: ${v.join("; ")}` : ""}; placeholder read blocked: ${guarded}.`,
+        measured: { violations: v.length },
+      };
+    },
+  },
+  {
+    id: "prov.sourced-data",
+    title: "Scientific values are backed by Operator-verified sources",
+    category: "provenance",
+    method:
+      "Count holmium properties by status and reference-registry citations by status. PASSED only if every empirical holmium " +
+      "property is SOURCED and every reference is OPERATOR_VERIFIED; FAILED if any reference has no source at all; otherwise INCONCLUSIVE.",
+    run: () => {
+      const props = HOLMIUM.properties;
+      const count = (s: string) => props.filter((p) => p.status === s).length;
+      const sourced = count("SOURCED"), placeholders = count("PLACEHOLDER"), derived = count("DERIVED"), defs = count("DEFINITION");
+      const refVerified = REGISTRY.filter((r) => r.citation.status === "OPERATOR_VERIFIED").length;
+      const refNone = REGISTRY.filter((r) => r.citation.status === "NONE");
+      const allGood = placeholders === 0 && refVerified === REGISTRY.length;
+      const status: ValidationStatus = refNone.length > 0 ? "FAILED" : allGood ? "PASSED" : "INCONCLUSIVE";
       return {
         status,
-        detail: `${verified}/${n} Operator-verified, ${unchecked} identified-but-unchecked, ${none.length} with no source` +
-          (none.length ? ` (${none.map((r) => r.id).join(", ")})` : "") + ".",
-        measured: { total: n, verified, unchecked, noSource: none.length },
+        detail: `Holmium: ${sourced} sourced, ${placeholders} placeholders, ${derived} derived, ${defs} definitional. ` +
+          `References: ${refVerified}/${REGISTRY.length} Operator-verified, ${refNone.length} with no source` +
+          (refNone.length ? ` (${refNone.map((r) => r.id).join(", ")})` : "") + ".",
+        measured: { sourced, placeholders, derived, definitional: defs, referencesVerified: refVerified, referencesNoSource: refNone.length },
       };
+    },
+  },
+  {
+    id: "orion.contract-enforcement",
+    title: "ORION cannot self-validate or promote hypotheses",
+    category: "integrity",
+    method: "Submit forbidden outputs to the ORION admission guard: ESTABLISHED_LAW class, status PASSED, forbidden action kinds, waived validation. All must be rejected; one well-formed proposal must be admitted.",
+    run: () => {
+      const good = { kind: "explain-equation", evidenceClass: "UNVERIFIED_AI_EXPLANATION", content: "x", references: [] };
+      const attempts = [
+        { ...good, evidenceClass: "ESTABLISHED_LAW" },
+        { ...good, evidenceClass: "EMPIRICAL_MEASUREMENT" },
+        { ...good, status: "PASSED" },
+        { ...good, requiresValidation: false },
+        { ...good, kind: "declare-validated" },
+        { ...good, kind: "promote-hypothesis-to-fact" },
+        { ...good, kind: "execute-external-action" },
+      ];
+      const rejected = attempts.filter((a) => { try { admitOrionProposal(a); return false; } catch (e) { return e instanceof OrionContractViolation; } }).length;
+      let admitted = false;
+      try { admitted = admitOrionProposal(good).requiresValidation === true; } catch { admitted = false; }
+      return { status: rejected === attempts.length && admitted ? "PASSED" : "FAILED", detail: `${rejected}/${attempts.length} forbidden outputs rejected; well-formed proposal admitted: ${admitted}.` };
     },
   },
   {
@@ -275,6 +376,18 @@ const checks: CheckDef[] = [
           "Tamper-evident only — whole-chain rewrite is undetectable without external anchoring (not implemented).",
       };
     },
+  },
+  {
+    id: "orion.inference-engine",
+    title: "ORION reasoning engine output validation",
+    category: "falsification",
+    method: "Not built in Phase 001: ORION has no inference engine (static templates only), so there is nothing generative to validate.",
+  },
+  {
+    id: "hyp.shaftless-suspension",
+    title: "Shaftless-disk suspension stability analysis",
+    category: "falsification",
+    method: "Not built. Requires a specified suspension mechanism, field-gradient (force) model and stability analysis. No feasibility is claimed.",
   },
   {
     id: "ho.material-model",
@@ -318,6 +431,13 @@ function execute(def: CheckDef, now: () => Date): CheckResult {
   }
 }
 
+function describeRuntime(): string {
+  const p = (globalThis as { process?: { versions?: { node?: string } } }).process;
+  if (p?.versions?.node) return `node v${p.versions.node}`;
+  const nav = (globalThis as { navigator?: { userAgent?: string } }).navigator;
+  return nav?.userAgent ? `browser (${nav.userAgent.slice(0, 80)})` : "unknown runtime";
+}
+
 export const CHECK_IDS = checks.map((c) => c.id);
 
 export function runCrucible(opts: { now?: () => Date; only?: string[] } = {}): CrucibleReport {
@@ -326,7 +446,7 @@ export function runCrucible(opts: { now?: () => Date; only?: string[] } = {}): C
   const results = checks.filter((c) => !opts.only || opts.only.includes(c.id)).map((c) => execute(c, now));
   const summary = Object.fromEntries(VALIDATION_STATUSES.map((s) => [s, 0])) as Record<ValidationStatus, number>;
   for (const r of results) summary[r.status]++;
-  return { softwareVersion: LAB_VERSION, runtime: `node ${process.version}`, startedAt, checks: results, summary };
+  return { softwareVersion: LAB_VERSION, runtime: describeRuntime(), startedAt, checks: results, summary };
 }
 
 /** Record a report: one ledger entry per check, written as the Crucible. */

@@ -20,12 +20,13 @@ test("PASSED/FAILED/INCONCLUSIVE only with a recorded execution; NOT IMPLEMENTED
 test("expected Phase 001 outcomes", () => {
   const s = Object.fromEntries(report.checks.map((c) => [c.id, c.status]));
   for (const id of ["dim.euler-equation", "init.input-admissibility", "cons.torque-free", "cons.magnetic", "conv.rk4-order",
-    "analytic.symmetric-top", "falsify.intermediate-axis", "repro.deterministic", "integrity.ledger-tamper-evidence"]) {
+    "analytic.symmetric-top", "falsify.intermediate-axis", "repro.deterministic", "integrity.ledger-tamper-evidence",
+    "inputs.validator-rejects-invalid", "math.workbench-form-equivalence", "prov.material-rules", "orion.contract-enforcement"]) {
     assert.equal(s[id], "PASSED", id);
   }
-  // Registry contains uncited AI-recalled values: provenance must NOT pass.
-  assert.equal(s["prov.registry-citations"], "FAILED");
-  for (const id of ["ho.material-model", "cryo.thermal-constraints", "integrity.ledger-persistence"]) assert.equal(s[id], "NOT IMPLEMENTED", id);
+  // References with no source exist (cryogenic placeholders): provenance must NOT pass.
+  assert.equal(s["prov.sourced-data"], "FAILED");
+  for (const id of ["orion.inference-engine", "hyp.shaftless-suspension", "ho.material-model", "cryo.thermal-constraints", "integrity.ledger-persistence"]) assert.equal(s[id], "NOT IMPLEMENTED", id);
 });
 
 test("summary counts match checks", () => {
